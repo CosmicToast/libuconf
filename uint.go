@@ -26,26 +26,40 @@ type UintOpt struct {
 // ---- integration with OptionSet
 
 // UintVar adds a UintOpt to the OptionSet
-func (o *OptionSet) UintVar(out *uint64, name string, val uint64, help string) {
-	o.ShortUintVar(out, name, 0, help)
+func (o *OptionSet) UintVar(out *uint64,
+	name string,
+	val uint64,
+	help string) Setter {
+	return o.ShortUintVar(out, name, 0, val, help)
 }
 
 // Uint adds a IntOpt to the OptionSet
-func (o *OptionSet) Uint(name string, val uint64, help string) *uint64 {
+func (o *OptionSet) Uint(name string,
+	val uint64,
+	help string) *uint64 {
 	return o.ShortUint(name, 0, val, help)
 }
 
 // ShortUintVar adds a IntOpt to the OptionSet
-func (o *OptionSet) ShortUintVar(out *uint64, name string, sname rune, help string) {
+func (o *OptionSet) ShortUintVar(out *uint64,
+	name string, sname rune,
+	val uint64,
+	help string) Setter {
+
+	*out = val
 	sopt := &UintOpt{help, name, sname, out}
 	o.Var(sopt)
+	return sopt
 }
 
 // ShortUint adds a UintOpt to the Option Set
-func (o *OptionSet) ShortUint(name string, sname rune, val uint64, help string) *uint64 {
-	out := &val
-	o.ShortUintVar(out, name, sname, help)
-	return out
+func (o *OptionSet) ShortUint(name string, sname rune,
+	val uint64,
+	help string) *uint64 {
+
+	var out uint64
+	o.ShortUintVar(&out, name, sname, val, help)
+	return &out
 }
 
 // ---- EnvOpt
@@ -53,8 +67,8 @@ func (o *OptionSet) ShortUint(name string, sname rune, val uint64, help string) 
 // Env returns the option's environment search string
 // For example, if the app name is APP and Env() returns "FOO"
 // We will look for an env var APP_FOO
-func (b *UintOpt) Env() string {
-	return env(b)
+func (r *UintOpt) Env() string {
+	return env(r)
 }
 
 // ---- FlagOpt
@@ -65,31 +79,31 @@ func (*UintOpt) Bool() bool {
 }
 
 // Flag returns the long-form flag for this option
-func (b *UintOpt) Flag() string {
-	return b.name
+func (r *UintOpt) Flag() string {
+	return r.name
 }
 
 // Help returns the help string for this option
-func (b *UintOpt) Help() string {
-	return b.help
+func (r *UintOpt) Help() string {
+	return r.help
 }
 
 // ShortFlag returns the short-form flag for this option
-func (b *UintOpt) ShortFlag() rune {
-	return b.sname
+func (r *UintOpt) ShortFlag() rune {
+	return r.sname
 }
 
 // ---- Getter
 
 // Get returns the internal value
-func (b *UintOpt) Get() interface{} {
-	return *b.val
+func (r *UintOpt) Get() interface{} {
+	return *r.val
 }
 
 // ---- Setter
 
 // Set sets this option's value
-func (b *UintOpt) Set(vv interface{}) error {
+func (r *UintOpt) Set(vv interface{}) error {
 	val := reflect.ValueOf(vv)
 	switch v := vv.(type) {
 	case string:
@@ -97,13 +111,13 @@ func (b *UintOpt) Set(vv interface{}) error {
 		if e != nil {
 			return fmt.Errorf("%w: to %+v", ErrSet, v)
 		}
-		*b.val = i
+		*r.val = i
 	case int8, int16, int32, int64, int:
-		*b.val = uint64(val.Int())
+		*r.val = uint64(val.Int())
 	case uint8, uint16, uint32, uint64, uint:
-		*b.val = val.Uint()
+		*r.val = val.Uint()
 	case float32, float64:
-		*b.val = uint64(val.Float()) // WARNING: WILL TRUNCATE
+		*r.val = uint64(val.Float()) // WARNING: WILL TRUNCATE
 	default:
 		return fmt.Errorf("%w: to %+v", ErrSet, vv)
 	}
@@ -114,6 +128,6 @@ func (b *UintOpt) Set(vv interface{}) error {
 
 // Toml returns the option's config file search string
 // It's passed as-is to toml.Tree.Get()
-func (b *UintOpt) Toml() string {
-	return _toml(b)
+func (r *UintOpt) Toml() string {
+	return _toml(r)
 }

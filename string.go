@@ -22,26 +22,40 @@ type StringOpt struct {
 // ---- integration with OptionSet
 
 // StringVar adds a StringOpt to the OptionSet
-func (o *OptionSet) StringVar(out *string, name, val, help string) {
-	o.ShortStringVar(out, name, 0, help)
+func (o *OptionSet) StringVar(out *string,
+	name string,
+	val string,
+	help string) *StringOpt {
+	return o.ShortStringVar(out, name, 0, val, help)
 }
 
 // String adds a StringOpt to the OptionSet
-func (o *OptionSet) String(name, val, help string) *string {
+func (o *OptionSet) String(name string,
+	val string,
+	help string) *string {
 	return o.ShortString(name, 0, val, help)
 }
 
 // ShortStringVar adds a StringOpt to the OptionSet
-func (o *OptionSet) ShortStringVar(out *string, name string, sname rune, help string) {
+func (o *OptionSet) ShortStringVar(out *string,
+	name string, sname rune,
+	val string,
+	help string) *StringOpt {
+
+	*out = val
 	sopt := &StringOpt{help, name, sname, out}
 	o.Var(sopt)
+	return sopt
 }
 
 // ShortString adds a StringOpt to the Option Set
-func (o *OptionSet) ShortString(name string, sname rune, val, help string) *string {
-	out := &val
-	o.ShortStringVar(&val, name, sname, help)
-	return out
+func (o *OptionSet) ShortString(name string, sname rune,
+	val string,
+	help string) *string {
+
+	var out string
+	o.ShortStringVar(&out, name, sname, val, help)
+	return &out
 }
 
 // ---- EnvOpt
@@ -49,8 +63,8 @@ func (o *OptionSet) ShortString(name string, sname rune, val, help string) *stri
 // Env returns the option's environment search string
 // For example, if the app name is APP and Env() returns "FOO"
 // We will look for an env var APP_FOO
-func (s *StringOpt) Env() string {
-	return env(s)
+func (r *StringOpt) Env() string {
+	return env(r)
 }
 
 // ---- FlagOpt
@@ -61,36 +75,36 @@ func (*StringOpt) Bool() bool {
 }
 
 // Flag returns the long-form flag for this option
-func (s *StringOpt) Flag() string {
-	return s.name
+func (r *StringOpt) Flag() string {
+	return r.name
 }
 
 // Help returns the help string for this option
-func (s *StringOpt) Help() string {
-	return s.help
+func (r *StringOpt) Help() string {
+	return r.help
 }
 
 // ShortFlag returns the short-form flag for this option
-func (s *StringOpt) ShortFlag() rune {
-	return s.sname
+func (r *StringOpt) ShortFlag() rune {
+	return r.sname
 }
 
 // ---- Getter
 
 // Get returns the internal value
-func (s *StringOpt) Get() interface{} {
-	return *s.val
+func (r *StringOpt) Get() interface{} {
+	return *r.val
 }
 
 // ---- Setter
 
 // Set sets this option's value
-func (s *StringOpt) Set(vv interface{}) error {
+func (r *StringOpt) Set(vv interface{}) error {
 	switch v := vv.(type) {
 	case string:
-		*s.val = v
+		*r.val = v
 	default:
-		*s.val = fmt.Sprint(vv)
+		*r.val = fmt.Sprint(vv)
 	}
 	return nil
 }
@@ -99,6 +113,6 @@ func (s *StringOpt) Set(vv interface{}) error {
 
 // Toml returns the option's config file search string
 // It's passed as-is to toml.Tree.Get()
-func (s *StringOpt) Toml() string {
-	return _toml(s)
+func (r *StringOpt) Toml() string {
+	return _toml(r)
 }
