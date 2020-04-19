@@ -1,0 +1,60 @@
+= libuconf: your one stop configuration shop
+
+Libuconf is a small go library to handle all sorts of configuration tasks.
+It consists of three primary components:
+
+* an extendable scaffolding system for arbitrary configuration systems
+* several built-in systems
+* several built-in types implementing these systems
+
+If this sounds confusing, don't worry!
+As a user you don't need to worry about any of this.
+If you're interested in the internals, head over to the "READING" file for a guided source-reading experience.
+
+== Basic Usage
+First, create an OptionSet - this is a set of options.
+[source, go]
+----
+optionset := &libuconf.OptionSet{AppName: "MyApp"} // <1>
+----
+<1> AppName is *required*. A constructor is coming in a future update.
+
+Then, register some options - the API might remind you of go's built-in flag handling (that's on purpose).
+[source, go]
+----
+var s1, s2 *string
+s1 = optionset.String("myflag", "initial value", "myflag help string")
+optionset.ShortStringVar(s2, "otherflag", 'o', "different value", "otherflag help string") <1>
+----
+<1> In this example, you can configure s2 with command line flags using `--otherflag` or `-o`.
+
+Once you're done registering flags, you can parse things!
+The built-in methods are ParseFlags, ParseEnv and ParseToml(File(s)|String).
+Further invocations overwrite previous ones (see notes).
+[source, go]
+----
+optionset.ParseTomlFile("/etc/app.toml")
+optionset.ParseTomlFile("~/.apprc") <1>
+optionset.ParseEnv() <2>
+err := optionset.ParseFlags(os.Args[1:]) <3>
+----
+<1> If an option is set in both app.toml and .apprc, .apprc will take precedence because it was parsed afterwards.
+<2> With the default option types, as in this example, s1 will be configured by the MYAPP_MYFLAG environment variable.
+<3> All the Parse* functions actually return error - please check them! A wrapper `DefaultParse()` will come in a future update.
+
+That's it, you're done, all your options should be set now.
+
+== Advanced Usage
+Every parsing method ("Env", "Flags", "Toml") is associated with an interface: `EnvOpt`, `FlagOpt` and `TomlOpt` respectively.
+All of these include the `Setter` interface, which defines the `Set(interface{}) error` function.
+
+`ParseEnv()` will look for environment variables that start with the capitalized contents of the OptionSet's application name, followed by an underscore and the output of `Env()` of each flag.
+`ParseToml*` will run the flag's `Toml()` output as a query against each TOML tree.
+Finally, `ParseFlags()` will look for long flags `Flag()` and short flags `ShortFlag()`.
+`Bool()` is needed for implicitly setting boolean flags on.
+
+NOTE: in a future update, there will also be a `Usage()` which will consume `FlagOpt`'s `Help()`.
+`Usage()` will show the current value for any given flag, rather than the specified default value.
+
+If you want to add additional configuration sources (such as consul, for example), you would simply define a new interface that includes `Setter` and any functions you need.
+Then you would add a new `Parse*` function to `OptionSet` that includes a type assertion.
