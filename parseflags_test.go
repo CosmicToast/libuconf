@@ -1,7 +1,9 @@
-package libuconf
+package libuconf_test
 
 import (
 	"testing"
+
+	. "toast.cafe/x/libuconf"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -14,8 +16,8 @@ func TestFindLongFlag(t *testing.T) {
 			in  *string
 			out FlagOpt
 		}{
-			{o.String("aflag", "aval", "ahelp"), o.findLongFlag("aflag")},
-			{o.String("bflag", "bval", "bhelp"), o.findLongFlag("bflag")},
+			{o.String("aflag", "aval", "ahelp"), o.FindLongFlag("aflag")},
+			{o.String("bflag", "bval", "bhelp"), o.FindLongFlag("bflag")},
 		}
 	)
 	for _, v := range matrix {
@@ -33,8 +35,8 @@ func TestFindShortFlag(t *testing.T) {
 			in  *string
 			out FlagOpt
 		}{
-			{o.ShortString("aflag", 'a', "aval", "ahelp"), o.findShortFlag('a')},
-			{o.ShortString("bflag", 'b', "bval", "bhelp"), o.findShortFlag('b')},
+			{o.ShortString("aflag", 'a', "aval", "ahelp"), o.FindShortFlag('a')},
+			{o.ShortString("bflag", 'b', "bval", "bhelp"), o.FindShortFlag('b')},
 		}
 	)
 	for _, v := range matrix {

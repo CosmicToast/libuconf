@@ -20,7 +20,8 @@ func (o *OptionSet) Visit(f func(Setter)) {
 	}
 }
 
-func (o *OptionSet) findLongFlag(s string) (res FlagOpt) {
+// FindLongFlag returns a FlagOpt based on the "Flag" property
+func (o *OptionSet) FindLongFlag(s string) (res FlagOpt) {
 	o.Visit(func(opt Setter) {
 		if oo, ok := opt.(FlagOpt); ok && oo.Flag() == s {
 			res = oo
@@ -29,7 +30,8 @@ func (o *OptionSet) findLongFlag(s string) (res FlagOpt) {
 	return
 }
 
-func (o *OptionSet) findShortFlag(c rune) (res FlagOpt) {
+// FindShortFlag returns a FlagOpt based on the "ShortFlag" property
+func (o *OptionSet) FindShortFlag(c rune) (res FlagOpt) {
 	if c == 0 {
 		return nil
 	}

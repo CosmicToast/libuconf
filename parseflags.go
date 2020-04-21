@@ -156,7 +156,7 @@ func (o *OptionSet) getLongFlag(s string) (FlagOpt, string) {
 			flag = append(flag, v)
 		}
 	}
-	opt := o.findLongFlag(string(flag))
+	opt := o.FindLongFlag(string(flag))
 	return opt, string(val)
 }
 
@@ -178,7 +178,7 @@ func (o *OptionSet) getShortFlags(s string) ([]FlagOpt, string) {
 			val = append(val, v)
 			continue
 		}
-		opt := o.findShortFlag(v)
+		opt := o.FindShortFlag(v)
 		// no flag, or last flag reqs value
 		if opt == nil || (res != nil && !res[len(res)-1].Bool()) {
 			done = true
