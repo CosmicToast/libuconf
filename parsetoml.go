@@ -12,7 +12,7 @@ func (o *OptionSet) ParseTomlFile(path string) error {
 }
 
 // ParseTomlFiles is a convenience function to run multiple ParseTomlFile s
-func (o *OptionSet) ParseTomlFiles(paths []string) error {
+func (o *OptionSet) ParseTomlFiles(paths ...string) error {
 	for _, v := range paths {
 		if err := o.ParseTomlFile(v); err != nil {
 			return err
