@@ -142,7 +142,6 @@ func (o *OptionSet) printflag(flen, llen int, f FlagOpt) string {
 		--flag      Still here (value).
 		--flag | -f Also still here.
 */
-// TODO: long help messages are not currently broken down.
 func (o *OptionSet) Usage() {
 	o.print("%s:\n", o.AppName)
 	flen := 0
