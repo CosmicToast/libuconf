@@ -1,5 +1,7 @@
 package libuconf
 
+import "fmt"
+
 // HelpOpt is a special Option to provide -h and --help
 type HelpOpt bool
 
@@ -36,8 +38,9 @@ func (r *HelpOpt) ShortFlag() rune {
 
 // Set sets this option's value
 func (r *HelpOpt) Set(vv interface{}) error {
-	*r = true // if help is mentioned, it's true
-	// otherwise, this is an implicit non-fatal failure:
-	// ./app false --help false
-	return nil
+	if v, ok := vv.(bool); ok {
+		*r = HelpOpt(v)
+		return nil
+	}
+	return fmt.Errorf("%w: help to %+v", ErrSet, vv)
 }
