@@ -161,4 +161,8 @@ func (o *OptionSet) Usage() {
 	o.VisitFlag(func(f FlagOpt) {
 		o.print(o.printflag(flen, llen, f))
 	})
+
+	if len(o.Args) > 0 {
+		o.print("Args: %q\n", o.Args)
+	}
 }
