@@ -30,18 +30,13 @@ func (o *OptionSet) ParseTomlString(c string) error {
 	return o.parseTomlTree(tree)
 }
 
-func (o *OptionSet) parseTomlTree(t *toml.Tree) error {
-	for _, vv := range o.Options {
-		v, ok := vv.(TomlOpt)
-		if !ok {
-			continue
-		}
+func (o *OptionSet) parseTomlTree(t *toml.Tree) (e error) {
+	o.VisitToml(func(v TomlOpt) {
 		out := t.Get(v.Toml())
-
 		if err := v.Set(out); err != nil {
-			return err
+			e = err
+			return
 		}
-	}
-
-	return nil
+	})
+	return
 }
