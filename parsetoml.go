@@ -1,8 +1,13 @@
 package libuconf
 
-import "github.com/pelletier/go-toml"
+import (
+	"os"
+
+	"github.com/pelletier/go-toml"
+)
 
 // ParseTomlFile parses a toml file, looking for options that implement TomlOpt
+// If there is an error, it is returned, even if it's just a missing file
 func (o *OptionSet) ParseTomlFile(path string) error {
 	tree, err := toml.LoadFile(path)
 	if err != nil {
@@ -12,9 +17,13 @@ func (o *OptionSet) ParseTomlFile(path string) error {
 }
 
 // ParseTomlFiles is a convenience function to run multiple ParseTomlFile s
+// It also ignores any missing files, unlike ParseTomlFile
 func (o *OptionSet) ParseTomlFiles(paths ...string) error {
 	for _, v := range paths {
 		if err := o.ParseTomlFile(v); err != nil {
+			if os.IsNotExist(err) { // ignore missing files
+				continue
+			}
 			return err
 		}
 	}
@@ -35,7 +44,6 @@ func (o *OptionSet) parseTomlTree(t *toml.Tree) (e error) {
 		out := t.Get(v.Toml())
 		if err := v.Set(out); err != nil {
 			e = err
-			return
 		}
 	})
 	return

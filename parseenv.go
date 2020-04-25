@@ -15,11 +15,9 @@ func (o *OptionSet) ParseEnv() (e error) {
 		if !ok {
 			return // continue
 		}
-
 		if err := v.Set(res); err != nil {
 			e = err
-			return
 		}
 	})
-	return nil
+	return
 }

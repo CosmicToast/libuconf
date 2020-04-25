@@ -18,14 +18,19 @@ func errSet(name, val string) error {
 	return fmt.Errorf("%w: %s to %s", ErrSet, name, val)
 }
 
-// ParseFlags parses a set of args (ss) and modifies the attached options
-// These formats are allowed:
-//   -abc value (where a and b are bool types)
-//   -dvalue
-//   --a.b.c=value
-//   --d.e.f value
-//   --g.h.i (where g.h.i is a bool type)
-// notably missing is -a=value, but you shouldn't need it
+/* ParseFlags parses a set of args (ss) and modifies the attached options
+These formats are allowed:
+ -abc value (where a and b are bool types)
+ -dvalue
+ --a.b.c=value
+ --d.e.f value
+ --g.h.i (where g.h.i is a bool type)
+notably missing is -a=value, but you shouldn't need it
+
+Note that non-registered flags are valid.
+For example, if you did not register a "foobar" flag, "--foobar=y" will be added
+to Args.
+*/
 func (o *OptionSet) ParseFlags(ss []string) error {
 	var (
 		done, handled bool
