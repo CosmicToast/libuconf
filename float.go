@@ -8,14 +8,14 @@ import (
 
 // ensure interface compliance
 var (
-	_ EnvOpt  = &FloatOpt{}
-	_ FlagOpt = &FloatOpt{}
-	_ Getter  = &FloatOpt{}
-	_ Setter  = &FloatOpt{}
-	_ TomlOpt = &FloatOpt{}
+	_ EnvOpt  = (*FloatOpt)(nil)
+	_ FlagOpt = (*FloatOpt)(nil)
+	_ Getter  = (*FloatOpt)(nil)
+	_ Setter  = (*FloatOpt)(nil)
+	_ TomlOpt = (*FloatOpt)(nil)
 )
 
-// FloatOpt represents an unsigned integer Option
+// FloatOpt represents a long float Option.
 type FloatOpt struct {
 	help  string
 	name  string
@@ -64,45 +64,53 @@ func (o *OptionSet) ShortFloat(name string, sname rune,
 
 // ---- EnvOpt
 
-// Env returns the option's environment search string
-// For example, if the app name is APP and Env() returns "FOO"
-// We will look for an env var APP_FOO
+// Env returns the option's environment search string.
+// For example, if the app name is "APP" and Env() returns "FOO", we will look
+// for the environment variable "APP_FOO".
 func (r *FloatOpt) Env() string {
 	return env(r)
 }
 
 // ---- FlagOpt
 
-// Bool returns whether or not this option is a boolean
+// Bool returns whether or not this option is a boolean.
+// This is important because ParseFlags() will handle them differently.
 func (*FloatOpt) Bool() bool {
 	return true
 }
 
-// Flag returns the long-form flag for this option
+// Flag returns the long-form flag for this option.
+// All strings are valid, but non-printable ones aren't useful.
 func (r *FloatOpt) Flag() string {
 	return r.name
 }
 
-// Help returns the help string for this option
+// Help returns the help string for this option.
+// It is only used in the Usage() call.
 func (r *FloatOpt) Help() string {
 	return r.help
 }
 
-// ShortFlag returns the short-form flag for this option
+// ShortFlag returns the short-form flag for this option.
+// All runes are valid, but non-printable ones aren't useful.
+// 0 means "disabled".
 func (r *FloatOpt) ShortFlag() rune {
 	return r.sname
 }
 
 // ---- Getter
 
-// Get returns the internal value
+// Get returns the internal value.
+// This is primarily used in Usage() to show the current value for options.
 func (r *FloatOpt) Get() interface{} {
 	return *r.val
 }
 
 // ---- Setter
 
-// Set sets this option's value
+// Set sets this option's value.
+// It should be able to handle whatever type it might receive, which means it
+// must at least handle strings for being usable in ParseFlags.
 func (r *FloatOpt) Set(vv interface{}) error {
 	val := reflect.ValueOf(vv)
 	switch v := vv.(type) {
@@ -126,8 +134,8 @@ func (r *FloatOpt) Set(vv interface{}) error {
 
 // ---- TomlOpt
 
-// Toml returns the option's config file search string
-// It's passed as-is to toml.Tree.Get()
+// Toml returns the option's config file search string.
+// It's passed as-is to toml.Tree.Get().
 func (r *FloatOpt) Toml() string {
 	return _toml(r)
 }

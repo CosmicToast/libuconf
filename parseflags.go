@@ -1,24 +1,8 @@
 package libuconf
 
-import (
-	"errors"
-	"fmt"
-)
+/*
+ParseFlags parses a set of args (ss) and modifies the attached options
 
-// Errors
-var (
-	ErrNoVal = errors.New("missing value")
-	ErrSet   = errors.New("failed to set")
-)
-
-func errNoVal(name string) error {
-	return fmt.Errorf("%w: %s", ErrNoVal, name)
-}
-func errSet(name, val string) error {
-	return fmt.Errorf("%w: %s to %s", ErrSet, name, val)
-}
-
-/* ParseFlags parses a set of args (ss) and modifies the attached options
 These formats are allowed:
  -abc value (where a and b are bool types)
  -dvalue

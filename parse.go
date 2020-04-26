@@ -1,6 +1,7 @@
 package libuconf
 
-/* Parse is a wrapper around all the built-in parse methods.
+/*
+Parse is a wrapper around all the built-in parse methods.
 
 First, it will parse all of the standard files for your platform.
 It will ignore "file missing" errors, but not any others (e.g setting errors).

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// ParseEnv will look for environment variables APPNAME_`option.Env()`
+// ParseEnv will look for environment variables APPNAME_`option.Env()`.
 // If one is found, it will try to set it.
 func (o *OptionSet) ParseEnv() (e error) {
 	prefix := strings.ToUpper(o.AppName)

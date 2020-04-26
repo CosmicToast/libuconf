@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// ParseStdToml parses the standard configuration files for a platform, in order
+// ParseStdToml parses the standard configuration files for a platform, in order.
 func (o *OptionSet) ParseStdToml() error {
 	// dirs
 	uhome, err := os.UserHomeDir()

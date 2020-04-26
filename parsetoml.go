@@ -6,8 +6,8 @@ import (
 	"github.com/pelletier/go-toml"
 )
 
-// ParseTomlFile parses a toml file, looking for options that implement TomlOpt
-// If there is an error, it is returned, even if it's just a missing file
+// ParseTomlFile parses a toml file, looking for options that implement TomlOpt.
+// If there is an error, it is returned, even if it's just a missing file.
 func (o *OptionSet) ParseTomlFile(path string) error {
 	tree, err := toml.LoadFile(path)
 	if err != nil {
@@ -16,8 +16,8 @@ func (o *OptionSet) ParseTomlFile(path string) error {
 	return o.parseTomlTree(tree)
 }
 
-// ParseTomlFiles is a convenience function to run multiple ParseTomlFile s
-// It also ignores any missing files, unlike ParseTomlFile
+// ParseTomlFiles is a convenience function to run multiple ParseTomlFile().
+// It also ignores any missing files, unlike ParseTomlFile.
 func (o *OptionSet) ParseTomlFiles(paths ...string) error {
 	for _, v := range paths {
 		if err := o.ParseTomlFile(v); err != nil {
@@ -30,7 +30,7 @@ func (o *OptionSet) ParseTomlFiles(paths ...string) error {
 	return nil
 }
 
-// ParseTomlString parses a string containing TOML data
+// ParseTomlString parses a string containing TOML data.
 func (o *OptionSet) ParseTomlString(c string) error {
 	tree, err := toml.Load(c)
 	if err != nil {
