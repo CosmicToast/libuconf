@@ -84,20 +84,28 @@ func (o *OptionSet) print(format string, a ...interface{}) (int, error) {
 	return fmt.Fprintf(os.Stderr, format, a...)
 }
 
-// print a single flag
-// "  "
-// --flag | -f -> flag part
-// buffer " " up to flen
-// Help up to llen-1 + "-" if continuation
-// flen -> continue help
-func (o *OptionSet) printflag(flen, llen int, f FlagOpt) string {
+/* print a single flag
+"  " ->
+if there is a short flag at all, "-f, " for short flags, or padding w/o ->
+--flag ->
+buffer " " up to flen
+Help() up to llen-1 + '-' if it's a non-word-boundary
+flen -> continue Help()
+*/
+func (o *OptionSet) printflag(flen, llen int, short bool, f FlagOpt) string {
 	var s strings.Builder
-	s.WriteString("  --")
-	s.WriteString(f.Flag())
-	if sf := f.ShortFlag(); sf != 0 {
-		s.WriteString(" | -")
-		s.WriteRune(sf)
+	s.WriteString("  ")
+	if short {
+		if sf := f.ShortFlag(); sf != 0 {
+			s.WriteRune('-')
+			s.WriteRune(sf)
+			s.WriteString(", ")
+		} else {
+			s.WriteString("    ") // - f , ' '
+		}
 	}
+	s.WriteString("--")
+	s.WriteString(f.Flag())
 
 	for i := flen - s.Len(); i > 0; i-- {
 		s.WriteRune(' ') // align
@@ -133,24 +141,39 @@ func (o *OptionSet) printflag(flen, llen int, f FlagOpt) string {
 	return s.String()
 }
 
-// Usage will use AppName and the Options that are FlagOpts to print usage info
-// The format looks like this:
-/*
-	AppName:
-		--flag | -f Really long help m-
-							  essage. (value)
-		--flag      Still here (value).
-		--flag | -f Also still here.
+/* Usage will use AppName and the Options that are FlagOpts to print usage info
+The format looks like this if there are no short flags:
+  AppName:
+    --flag Really long help
+           message.
+    --ofl  Other really lon-
+           g help message.
+    --fl   Help message.
+
+Or like this if there is at least one:
+  AppName:
+    -f, --flag Really long help
+               message.
+    -o, --of   Other really lon-
+               g help message.
+        --st   Standalone flag.
 */
 func (o *OptionSet) Usage() {
 	o.print("%s:\n", o.AppName)
 	flen := 0
 	llen := 80 // TODO: don't default to 80
+	short := false
 
 	o.VisitFlag(func(v FlagOpt) {
 		vlen := len(v.Flag()) + 4 // "  --" -> 4
 		if v.ShortFlag() != 0 {
-			vlen += 5 // " | -x"
+			if !short {
+				flen += 4 // - f , ' '; we didn't know we had short flags until now
+			}
+			short = true
+		}
+		if short {
+			vlen += 4
 		}
 
 		if vlen > flen {
@@ -159,7 +182,7 @@ func (o *OptionSet) Usage() {
 	})
 
 	o.VisitFlag(func(f FlagOpt) {
-		o.print(o.printflag(flen, llen, f))
+		o.print(o.printflag(flen, llen, short, f))
 	})
 
 	if len(o.Args) > 0 {
