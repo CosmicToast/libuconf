@@ -42,6 +42,9 @@ func (o *OptionSet) ParseTomlString(c string) error {
 func (o *OptionSet) parseTomlTree(t *toml.Tree) (e error) {
 	o.VisitToml(func(v TomlOpt) {
 		out := t.Get(v.Toml())
+		if out == nil {
+			return
+		}
 		if err := v.Set(out); err != nil {
 			e = err
 		}
