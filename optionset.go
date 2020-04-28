@@ -13,6 +13,11 @@ type OptionSet struct {
 	Args    []string
 }
 
+// NewOptionSet instantiates an OptionSet for a specific application name.
+func NewOptionSet(name string) *OptionSet {
+	return &OptionSet{AppName: name}
+}
+
 // Arg is a convenience function for safe access to OptionSet.Args.
 func (o *OptionSet) Arg(i int) string {
 	if i < 0 || i > len(o.Args) {
