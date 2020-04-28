@@ -11,13 +11,6 @@ var (
 // HelpOpt is a special Option to provide -h and --help.
 type HelpOpt bool
 
-// Help adds --help and -h flags to the OptionSet.
-func (o *OptionSet) Help() *bool {
-	out := new(bool)
-	o.Var((*HelpOpt)(out))
-	return out
-}
-
 // ---- FlagOpt
 
 // Bool returns whether or not this option is a boolean.

@@ -23,43 +23,10 @@ type IntOpt struct {
 	val   *int64
 }
 
-// ---- integration with OptionSet
-
-// IntVar adds a IntOpt to the OptionSet
-func (o *OptionSet) IntVar(out *int64,
-	name string,
-	val int64,
-	help string) Setter {
-	return o.ShortIntVar(out, name, 0, val, help)
-}
-
-// Int adds a IntOpt to the OptionSet
-func (o *OptionSet) Int(name string,
-	val int64,
-	help string) *int64 {
-	return o.ShortInt(name, 0, val, help)
-}
-
-// ShortIntVar adds a IntOpt to the OptionSet
-func (o *OptionSet) ShortIntVar(out *int64,
-	name string, sname rune,
-	val int64,
-	help string) Setter {
-
-	*out = val
-	sopt := &IntOpt{help, name, sname, out}
-	o.Var(sopt)
-	return sopt
-}
-
-// ShortInt adds a IntOpt to the Option Set
-func (o *OptionSet) ShortInt(name string, sname rune,
-	val int64,
-	help string) *int64 {
-
-	var out int64
-	o.ShortIntVar(&out, name, sname, val, help)
-	return &out
+// NewIntOpt instantiates a IntOpt and returns needed implementation details.
+func NewIntOpt(name string, sname rune, val int64, help string) (*IntOpt, *int64) {
+	out := IntOpt{help, name, sname, &val}
+	return &out, out.val
 }
 
 // ---- EnvOpt

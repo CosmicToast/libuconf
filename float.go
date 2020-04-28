@@ -23,43 +23,10 @@ type FloatOpt struct {
 	val   *float64
 }
 
-// ---- integration with OptionSet
-
-// FloatVar adds a FloatOpt to the OptionSet
-func (o *OptionSet) FloatVar(out *float64,
-	name string,
-	val float64,
-	help string) *FloatOpt {
-	return o.ShortFloatVar(out, name, 0, val, help)
-}
-
-// Float adds a IntOpt to the OptionSet
-func (o *OptionSet) Float(name string,
-	val float64,
-	help string) *float64 {
-	return o.ShortFloat(name, 0, val, help)
-}
-
-// ShortFloatVar adds a IntOpt to the OptionSet
-func (o *OptionSet) ShortFloatVar(out *float64,
-	name string, sname rune,
-	val float64,
-	help string) *FloatOpt {
-
-	*out = val
-	sopt := &FloatOpt{help, name, sname, out}
-	o.Var(sopt)
-	return sopt
-}
-
-// ShortFloat adds a FloatOpt to the Option Set
-func (o *OptionSet) ShortFloat(name string, sname rune,
-	val float64,
-	help string) *float64 {
-
-	var out float64
-	o.ShortFloatVar(&out, name, sname, val, help)
-	return &out
+// NewFloatOpt instantiates a FloatOpt and returns needed implementation details.
+func NewFloatOpt(name string, sname rune, val float64, help string) (*FloatOpt, *float64) {
+	out := FloatOpt{help, name, sname, &val}
+	return &out, out.val
 }
 
 // ---- EnvOpt

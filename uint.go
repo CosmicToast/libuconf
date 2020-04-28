@@ -23,43 +23,10 @@ type UintOpt struct {
 	val   *uint64
 }
 
-// ---- integration with OptionSet
-
-// UintVar adds a UintOpt to the OptionSet
-func (o *OptionSet) UintVar(out *uint64,
-	name string,
-	val uint64,
-	help string) Setter {
-	return o.ShortUintVar(out, name, 0, val, help)
-}
-
-// Uint adds a IntOpt to the OptionSet
-func (o *OptionSet) Uint(name string,
-	val uint64,
-	help string) *uint64 {
-	return o.ShortUint(name, 0, val, help)
-}
-
-// ShortUintVar adds a IntOpt to the OptionSet
-func (o *OptionSet) ShortUintVar(out *uint64,
-	name string, sname rune,
-	val uint64,
-	help string) Setter {
-
-	*out = val
-	sopt := &UintOpt{help, name, sname, out}
-	o.Var(sopt)
-	return sopt
-}
-
-// ShortUint adds a UintOpt to the Option Set
-func (o *OptionSet) ShortUint(name string, sname rune,
-	val uint64,
-	help string) *uint64 {
-
-	var out uint64
-	o.ShortUintVar(&out, name, sname, val, help)
-	return &out
+// NewUintOpt instantiates a UintOpt and returns needed implementation details.
+func NewUintOpt(name string, sname rune, val uint64, help string) (*UintOpt, *uint64) {
+	out := UintOpt{help, name, sname, &val}
+	return &out, out.val
 }
 
 // ---- EnvOpt

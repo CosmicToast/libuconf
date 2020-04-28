@@ -19,43 +19,10 @@ type StringOpt struct {
 	val   *string
 }
 
-// ---- integration with OptionSet
-
-// StringVar adds a StringOpt to the OptionSet
-func (o *OptionSet) StringVar(out *string,
-	name string,
-	val string,
-	help string) *StringOpt {
-	return o.ShortStringVar(out, name, 0, val, help)
-}
-
-// String adds a StringOpt to the OptionSet
-func (o *OptionSet) String(name string,
-	val string,
-	help string) *string {
-	return o.ShortString(name, 0, val, help)
-}
-
-// ShortStringVar adds a StringOpt to the OptionSet
-func (o *OptionSet) ShortStringVar(out *string,
-	name string, sname rune,
-	val string,
-	help string) *StringOpt {
-
-	*out = val
-	sopt := &StringOpt{help, name, sname, out}
-	o.Var(sopt)
-	return sopt
-}
-
-// ShortString adds a StringOpt to the Option Set
-func (o *OptionSet) ShortString(name string, sname rune,
-	val string,
-	help string) *string {
-
-	var out string
-	o.ShortStringVar(&out, name, sname, val, help)
-	return &out
+// NewStringOpt instantiates a StringOpt and returns needed implementation details.
+func NewStringOpt(name string, sname rune, val string, help string) (*StringOpt, *string) {
+	out := StringOpt{help, name, sname, &val}
+	return &out, out.val
 }
 
 // ---- EnvOpt

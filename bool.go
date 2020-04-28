@@ -22,43 +22,10 @@ type BoolOpt struct {
 	val   *bool
 }
 
-// ---- integration with OptionSet
-
-// BoolVar adds a BoolOpt to the OptionSet
-func (o *OptionSet) BoolVar(out *bool,
-	name string,
-	val bool,
-	help string) *BoolOpt {
-	return o.ShortBoolVar(out, name, 0, val, help)
-}
-
-// Bool adds a BoolOpt to the OptionSet
-func (o *OptionSet) Bool(name string,
-	val bool,
-	help string) *bool {
-	return o.ShortBool(name, 0, val, help)
-}
-
-// ShortBoolVar adds a BoolOpt to the OptionSet
-func (o *OptionSet) ShortBoolVar(out *bool,
-	name string, sname rune,
-	val bool,
-	help string) *BoolOpt {
-
-	*out = val
-	sopt := &BoolOpt{help, name, sname, out}
-	o.Var(sopt)
-	return sopt
-}
-
-// ShortBool adds a BoolOpt to the Option Set
-func (o *OptionSet) ShortBool(name string, sname rune,
-	val bool,
-	help string) *bool {
-
-	var out bool
-	o.ShortBoolVar(&out, name, sname, val, help)
-	return &out
+// NewBoolOpt instantiates a BoolOpt and returns needed implementation details.
+func NewBoolOpt(name string, sname rune, val bool, help string) (*BoolOpt, *bool) {
+	out := BoolOpt{help, name, sname, &val}
+	return &out, out.val
 }
 
 // ---- EnvOpt

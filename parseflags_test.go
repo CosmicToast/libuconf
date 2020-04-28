@@ -16,8 +16,8 @@ func TestFindLongFlag(t *testing.T) {
 			in  *string
 			out FlagOpt
 		}{
-			{o.String("aflag", "aval", "ahelp"), o.FindLongFlag("aflag")},
-			{o.String("bflag", "bval", "bhelp"), o.FindLongFlag("bflag")},
+			{o.String("aflag", 0, "aval", "ahelp"), o.FindLongFlag("aflag")},
+			{o.String("bflag", 0, "bval", "bhelp"), o.FindLongFlag("bflag")},
 		}
 	)
 	for _, v := range matrix {
@@ -35,8 +35,8 @@ func TestFindShortFlag(t *testing.T) {
 			in  *string
 			out FlagOpt
 		}{
-			{o.ShortString("aflag", 'a', "aval", "ahelp"), o.FindShortFlag('a')},
-			{o.ShortString("bflag", 'b', "bval", "bhelp"), o.FindShortFlag('b')},
+			{o.String("aflag", 'a', "aval", "ahelp"), o.FindShortFlag('a')},
+			{o.String("bflag", 'b', "bval", "bhelp"), o.FindShortFlag('b')},
 		}
 	)
 	for _, v := range matrix {
@@ -60,7 +60,7 @@ func TestParseLongFlags(t *testing.T) {
 		}
 	)
 	for _, v := range matrix {
-		v.oval = o.String(v.flag, "", v.flag+"help")
+		v.oval = o.String(v.flag, 0, "", v.flag+"help")
 		flag := "--" + v.flag
 
 		// --a.b.c=val
@@ -107,7 +107,7 @@ func TestParseShortFlags(t *testing.T) {
 			sflag = string(v.flag)
 			flag  = "-" + sflag
 		)
-		v.oval = o.ShortString(sflag, v.flag, "", sflag+"help")
+		v.oval = o.String(sflag, v.flag, "", sflag+"help")
 
 		// -a val
 		err := o.ParseFlags([]string{
@@ -145,8 +145,8 @@ func TestParseLongFlagsBool(t *testing.T) {
 	var (
 		assert = assert.New(t)
 		o      = &OptionSet{AppName: "test"}
-		a      = o.Bool("aa", false, "aahelp")
-		b      = o.Bool("bb", false, "bbhelp")
+		a      = o.Bool("aa", 0, false, "aahelp")
+		b      = o.Bool("bb", 0, false, "bbhelp")
 	)
 
 	err := o.ParseFlags([]string{
@@ -188,8 +188,8 @@ func TestParseShortFLagsBool(t *testing.T) {
 	var (
 		assert = assert.New(t)
 		o      = &OptionSet{AppName: "test"}
-		a      = o.ShortBool("aa", 'a', false, "aahelp")
-		b      = o.ShortBool("bb", 'b', false, "bbhelp")
+		a      = o.Bool("aa", 'a', false, "aahelp")
+		b      = o.Bool("bb", 'b', false, "bbhelp")
 	)
 
 	err := o.ParseFlags([]string{
