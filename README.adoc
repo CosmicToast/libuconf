@@ -15,18 +15,23 @@ If you're interested in the internals, head over to the "READING" file for a gui
 First, create an OptionSet - this is a set of options.
 [source, go]
 ----
-optionset := &libuconf.OptionSet{AppName: "MyApp"} // <1>
+optionset := &libuconf.NewOptionSet("MyApp")
 ----
-<1> AppName is *required*. A constructor is coming in a future update.
 
 Then, register some options - the API might remind you of go's built-in flag handling (that's on purpose).
 [source, go]
 ----
-var s1, s2 *string
-s1 = optionset.String("myflag", "initial value", "myflag help string")
-optionset.ShortStringVar(s2, "otherflag", 'o', "different value", "otherflag help string") <1>
+var s1, s2, s3 *string
+s1 = optionset.String("myflag", 0, "initial value", "myflag help string") <1>
+optionset.StringVar(s2, "otherflag", 'o', "different value", "otherflag help string") <2>
+
+opt, s3 := optionset.NewStringOpt("thirdflag", 't', "third value", "help string") <3>
+optionset.Var(opt) <4>
 ----
-<1> In this example, you can configure s2 with command line flags using `--otherflag` or `-o`.
+<1> The 0 here is the null byte - if you set the short option to that, it's considered disabled.
+<2> In this example, you can configure s2 with command line flags using `--otherflag` or `-o`.
+<3> You can also create the underlying "Option" types.
+<4> If you do that, however, you must register them with your OptionSet separately!
 
 Once you're done registering flags, you can parse things!
 The built-in methods are ParseFlags, ParseEnv and ParseToml(File(s)|String).
@@ -37,10 +42,12 @@ optionset.ParseTomlFile("/etc/app.toml")
 optionset.ParseTomlFile("~/.apprc") <1>
 optionset.ParseEnv() <2>
 err := optionset.ParseFlags(os.Args[1:]) <3>
+err = optionset.Parse(os.Args[1:]) <4>
 ----
 <1> If an option is set in both app.toml and .apprc, .apprc will take precedence because it was parsed afterwards.
 <2> With the default option types, as in this example, s1 will be configured by the MYAPP_MYFLAG environment variable.
-<3> All the Parse* functions actually return error - please check them! A wrapper `DefaultParse()` will come in a future update.
+<3> All the Parse* functions actually return error - please check them!
+<4> Parse() will parse all of the standard files for your OS, followed by the environment, and finally the cli.
 
 That's it, you're done, all your options should be set now.
 
@@ -52,9 +59,7 @@ All of these include the `Setter` interface, which defines the `Set(interface{})
 `ParseToml*` will run the flag's `Toml()` output as a query against each TOML tree.
 Finally, `ParseFlags()` will look for long flags `Flag()` and short flags `ShortFlag()`.
 `Bool()` is needed for implicitly setting boolean flags on.
-
-NOTE: in a future update, there will also be a `Usage()` which will consume `FlagOpt`'s `Help()`.
-`Usage()` will show the current value for any given flag, rather than the specified default value.
+`Usage()` consumes `AppName`, `Help()`, `Get()` and the two `Flag*` functions to generate a usage string - this means it shows you the "current" value in the help string, rather than the default you set.
 
 If you want to add additional configuration sources (such as consul, for example), you would simply define a new interface that includes `Setter` and any functions you need.
-Then you would add a new `Parse*` function to `OptionSet` that includes a type assertion.
+Then you would add a new `Parse*` function to `OptionSet` that includes a type assertion (or uses a new Visit* function).
