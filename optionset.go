@@ -9,19 +9,27 @@ import (
 // OptionSet represents a set of options.
 type OptionSet struct {
 	AppName string
-	Options []Setter // least common denominator
+	options []Setter // least common denominator
 	Args    []string
+}
+
+// Arg is a convenience function for safe access to OptionSet.Args.
+func (o *OptionSet) Arg(i int) string {
+	if i < 0 || i > len(o.Args) {
+		return ""
+	}
+	return o.Args[i]
 }
 
 // Var adds an option to the OptionSet.
 // It is expected to be pre-set to its default value.
 func (o *OptionSet) Var(opt Setter) {
-	o.Options = append(o.Options, opt)
+	o.options = append(o.options, opt)
 }
 
 // Visit visits each option, passing it to the argument function.
 func (o *OptionSet) Visit(f func(Setter)) {
-	for _, opt := range o.Options {
+	for _, opt := range o.options {
 		f(opt)
 	}
 }
