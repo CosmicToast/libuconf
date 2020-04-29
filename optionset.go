@@ -6,6 +6,11 @@ import (
 	"strings"
 )
 
+// if hl is less than this, just print Help() out
+// don't make this > expected values for flen though,
+// llen will be == 0 if output isn't a tty
+const minHL = 5
+
 // OptionSet represents a set of options.
 type OptionSet struct {
 	AppName string
@@ -128,6 +133,9 @@ func (o *OptionSet) printflag(flen, llen int, short bool, f FlagOpt) string {
 	s.WriteRune(' ')
 
 	hl := llen - flen - 1
+	if hl < minHL { // includes llen = 0, which is in case of non-terminal output
+		hl = 0
+	}
 	h := f.Help()
 
 	// add value to help, if it's there
@@ -136,8 +144,8 @@ func (o *OptionSet) printflag(flen, llen int, short bool, f FlagOpt) string {
 	}
 
 	for { // write help
-		if len(h) <= hl { // it all fits
-			s.WriteString(h)
+		if hl == 0 || len(h) <= hl { // it all fits, output isn't a terminal
+			s.WriteString(h) // or output is way too small
 			break
 		} // it doesn't fit
 		if h[hl] == ' ' || h[hl] == '\n' { // we're at a word-boundary
